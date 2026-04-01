@@ -1,0 +1,37 @@
+<main class="app-shell">
+  <header class="app-header">
+    <h1>🏦 Lipari Bank</h1>
+    <span class="subtitle">Movimenti Conto Corrente</span>
+  </header>
+
+  <section class="app-content">
+    <app-account-movements />
+  </section>
+</main>
+
+<style>
+  .app-shell {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  .app-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 32px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .app-header h1 {
+    font-size: 1.75rem;
+    color: #1a1a2e;
+  }
+
+  .subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+</style>

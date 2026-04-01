@@ -1,0 +1,156 @@
+<div class="account-movements">
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <h2 class="toolbar__title">Estratto Conto</h2>
+    <button class="btn-reset" (click)="resetListFilter()">
+      ↺ Reset filtri
+    </button>
+  </div>
+
+  <!-- Movement list child component -->
+  <app-movement-list
+    [movements]="movements()"
+    [isLoading]="isLoading()"
+    [error]="error()"
+    (movementSelect)="onMovementSelected($event)">
+  </app-movement-list>
+
+  <!-- Selected movement detail panel -->
+  @if (selectedMovement()) {
+    <div class="detail-panel">
+      <div class="detail-panel__header">
+        <h3>Dettaglio Movimento</h3>
+        <button class="detail-panel__close" (click)="selectedMovement.set(null)">✕</button>
+      </div>
+
+      <dl class="detail-grid">
+        <dt>Data</dt>
+        <dd>{{ selectedMovement()!.date | date:'dd MMMM yyyy' : '' : 'it-IT' }}</dd>
+
+        <dt>Descrizione</dt>
+        <dd>{{ selectedMovement()!.description }}</dd>
+
+        <dt>Categoria</dt>
+        <dd>{{ selectedMovement()!.category }}</dd>
+
+        <dt>Tipo</dt>
+        <dd>{{ selectedMovement()!.type }}</dd>
+
+        <dt>Importo</dt>
+        <dd class="detail-amount"
+            [class.amount--credit]="selectedMovement()!.type === 'CREDIT'"
+            [class.amount--debit]="selectedMovement()!.type === 'DEBIT'">
+          {{ selectedMovement()!.amount | bankCurrency }}
+        </dd>
+      </dl>
+    </div>
+  } @else {
+    <div class="detail-hint">
+      👆 Clicca un movimento per vedere il dettaglio
+    </div>
+  }
+
+</div>
+
+<style>
+  .account-movements {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .toolbar__title {
+    font-size: 1.1rem;
+    color: #334155;
+  }
+
+  .btn-reset {
+    padding: 6px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    color: #475569;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover {
+      background: #f1f5f9;
+    }
+  }
+
+  /* Detail panel */
+  .detail-panel {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    padding: 20px;
+  }
+
+  .detail-panel__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h3 {
+      font-size: 1rem;
+      color: #1e293b;
+    }
+  }
+
+  .detail-panel__close {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    color: #94a3b8;
+    cursor: pointer;
+
+    &:hover { color: #475569; }
+  }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px 16px;
+
+    dt {
+      color: #94a3b8;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      align-self: center;
+    }
+
+    dd {
+      color: #1e293b;
+      font-size: 0.92rem;
+    }
+  }
+
+  .detail-amount {
+    font-weight: 700;
+    font-size: 1.1rem !important;
+
+    &.amount--credit { color: #16a34a; }
+    &.amount--debit  { color: #dc2626; }
+  }
+
+  .detail-hint {
+    text-align: center;
+    padding: 16px;
+    color: #94a3b8;
+    font-size: 0.88rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px dashed #e2e8f0;
+  }
+</style>
