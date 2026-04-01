@@ -45,7 +45,7 @@
 
     <!-- Movement list -->
     <ul class="movements">
-      @for (movement of movements(); track movement.id) {
+      @for (movement of filteredMovements(); track movement.id) {
         <li class="movement-item" (click)="selectMovement(movement)">
           <div class="movement-meta">
             <span class="movement-date">{{ movement.date | date:'dd/MM/yyyy' }}</span>
@@ -57,10 +57,10 @@
 
             <div class="movement-right">
               @switch (movement.type) {
-                @case ('credit') {
+                @case ('CREDIT') {
                   <span class="badge badge--credit">↑ Entrata</span>
                 }
-                @case ('debit') {
+                @case ('DEBIT') {
                   <span class="badge badge--debit">↓ Uscita</span>
                 }
                 @default {
