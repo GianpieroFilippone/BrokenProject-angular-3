@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, signal, viewChild, computed } from '@angular/core';
 import { AccountMovement, MOCK_MOVEMENTS } from '../../models/movement.model';
 import { MovementListComponent } from '../../components/movement-list/movement-list.component';
 import { BankCurrencyPipe } from '../../../../shared/pipes/bank-currency.pipe';
-import { DatePipe } from '@angular/common';
-import { JsonPipe } from '@angular/common';
+import { DatePipe, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-account-movements',
@@ -20,26 +19,51 @@ export class AccountMovementsComponent implements OnInit {
 
   movementList = viewChild(MovementListComponent);
 
-  ngOnInit(): void {
-  this.isLoading.set(true);
+  // Legge i movimenti filtrati dal figlio tramite viewChild
+  filteredMovements = computed(() => this.movementList()?.filteredMovements() ?? []);
 
-  setTimeout(() => {
-    // bug fix 2: convert date strings to Date objects
-    this.movements.set(
-      MOCK_MOVEMENTS.map(m => ({ ...m, date: new Date(m.date) }))
-    );
-    this.isLoading.set(false);
-  }, 500);
-}
+  ngOnInit(): void {
+    this.isLoading.set(true);
+    setTimeout(() => {
+      this.movements.set(
+        MOCK_MOVEMENTS.map(m => ({ ...m, date: new Date(m.date) }))
+      );
+      this.isLoading.set(false);
+    }, 500);
+  }
 
   onMovementSelected(movement: AccountMovement): void {
-  console.log('RECEIVED:', movement);
-  this.selectedMovement.set(movement);
-  console.log('SIGNAL VALUE:', this.selectedMovement());
-}
+    this.selectedMovement.set(movement);
+  }
 
   resetListFilter(): void {
     this.movementList()?.resetFilter();
     this.selectedMovement.set(null);
+  }
+
+  // Genera e scarica il CSV
+  exportCsv(): void {
+    const movements = this.filteredMovements();
+    if (!movements.length) return;
+
+    const header = 'Data,Descrizione,Tipo,Importo';
+    const rows = movements.map(m => {
+      const date = new Date(m.date).toLocaleDateString('it-IT');
+      const description = `"${m.description.replace(/"/g, '""')}"`;
+      const type = m.type === 'CREDIT' ? 'Entrata' : 'Uscita';
+      const amount = m.amount.toFixed(2).replace('.', ',');
+      return `${date},${description},${type},${amount}`;
+    });
+
+    const csv = [header, ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'movimenti.csv';
+    link.click();
+
+    URL.revokeObjectURL(url);
   }
 }

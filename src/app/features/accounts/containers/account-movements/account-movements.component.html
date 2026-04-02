@@ -2,20 +2,33 @@
 
   <!-- Toolbar -->
   <div class="toolbar">
-    <h2 class="toolbar__title">Estratto Conto</h2>
+  <h2 class="toolbar__title">Estratto Conto</h2>
+
+  <div class="toolbar__actions">
     <button class="btn-reset" (click)="resetListFilter()">
       ↺ Reset filtri
     </button>
+
+    <!-- Disabilitato se lista filtrata è vuota -->
+    <button
+      class="btn-export"
+      (click)="exportCsv()"
+      [disabled]="filteredMovements().length === 0">
+      ⬇ Esporta CSV
+    </button>
   </div>
+</div>
 
   <!-- Movement list child component -->
   <app-movement-list
     [movements]="movements()"
     [isLoading]="isLoading()"
     [error]="error()"
-    (movementSelect)="onMovementSelected($event)">
-  </app-movement-list>
+    (movementSelected)="onMovementSelected($event)"
+  />
 
+  
+  
   <!-- Selected movement detail panel -->
   @if (selectedMovement()) {
     <div class="detail-panel">
@@ -26,7 +39,7 @@
 
       <dl class="detail-grid">
         <dt>Data</dt>
-        <dd>{{ selectedMovement()!.date | date:'dd MMMM yyyy' : '' : 'it-IT' }}</dd>
+        <dd>{{ selectedMovement()!.date | date:'dd MMMM yyyy' : 'it-IT' }}</dd>
 
         <dt>Descrizione</dt>
         <dd>{{ selectedMovement()!.description }}</dd>
@@ -84,7 +97,31 @@
     &:hover {
       background: #f1f5f9;
     }
+    
   }
+
+  .btn-export {
+    padding: 6px 14px;
+    border: 1px solid #3b82f6;
+    border-radius: 6px;
+    background: #3b82f6;
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: 5px;
+
+    &:hover:not(:disabled) {
+      background: #2563eb;
+      border-color: #2563eb;
+    }
+
+    &:disabled {
+      background: #93c5fd;
+      border-color: #93c5fd;
+      cursor: not-allowed;
+    }
+  } 
 
   /* Detail panel */
   .detail-panel {
